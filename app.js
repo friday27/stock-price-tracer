@@ -97,7 +97,7 @@ function calculateAvg(days = 7) {
         (stocks[a].avgPrice - stocks[a].targetPrice))
   );
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 20; i++) {
     console.log(sortedStocks[i], stocks[sortedStocks[i]]);
   }
 }

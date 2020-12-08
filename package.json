@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "* Fetch all TW stocks and the price in 10 years * Run a cronjob to update prices every day after market closed * List stocks with price lower than 5Y avg, 10Y avg, _Y avg and deviations * Back trace to see how much it will earn in the past 3 years * Chatbot as a reminder (sell/buy) * US version",
   "main": "app.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/friday27/stock-price-tracer.git"
@@ -18,5 +17,8 @@
   "homepage": "https://github.com/friday27/stock-price-tracer#readme",
   "dependencies": {
     "axios": "^0.21.0"
+  },
+  "devDependencies": {
+    "prettier": "2.2.1"
   }
 }
