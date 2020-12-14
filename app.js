@@ -98,6 +98,10 @@ function calculateAvg(days = 7) {
   );
 
   for (let i = 0; i < 20; i++) {
+    if (stocks[sortedStocks[i]].targetPrice < stocks[sortedStocks[i]].prices.slice(-1)) {
+      console.log("No more target");
+      break;
+    }
     console.log(sortedStocks[i], stocks[sortedStocks[i]]);
   }
 }
