@@ -3,112 +3,73 @@
 const axios = require("axios");
 const fs = require("fs");
 
-const URL =
-  "http://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=open_dat";
+const DAYS = 90;
+const URL = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=";
 
-async function getDailyData() {
-  try {
-    const res = await axios.get(URL);
-    const date = res.data.date;
+const today = new Date();
 
-    const stocks = {};
-    res.data.data.forEach((stockArr) => {
-      stocks[stockArr[0]] = {
-        avgPrice: (parseFloat(stockArr[4]) + parseFloat(stockArr[7])) / 2,
-        totalAmount: stockArr[2],
-      };
-    });
-
-    // concat data
-    let pastData = {};
-    const filename = `./data/${date.slice(0, 6)}-stock-prices.json`;
-    try {
-      pastData = JSON.parse(fs.readFileSync(filename));
-    } catch (e) {
-      // skip if the data doesn't exist
-    }
-    pastData[date] = stocks;
-
-    fs.writeFileSync(filename, JSON.stringify(pastData, null, 2));
-
-    console.log(`${date} data saved`);
-  } catch (e) {
-    console.log(`getDailyData: ${e}`);
-  }
+function sleep(ms=2500) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function calculateAvg(days = 7) {
-  let dates = [];
-  const today = new Date();
-  const time = today.getTime();
-  for (let i = days; i >= 0; i--) {
-    const tmpDate = new Date(time - 24 * 60 * 60 * 1000 * i);
-    dates.push(
-      `${tmpDate.getFullYear()}${tmpDate.getMonth() + 1}${(
-        "0" + tmpDate.getDate()
-      ).slice(-2)}`
-    );
-  }
+async function calDates() {
+  const dates = [];
 
+  for (let i = parseInt(DAYS/30); i >= 0; i--) {
+    let date = today.getTime() - i * 30 * 24 * 60 * 60 * 1000;
+    date = new Date(date);
+    date = `${date.getFullYear()}${("0"+(date.getMonth()+1)).slice(-2)}01`;
+    dates.push(date);
+  }
+  return dates;
+}
+
+async function fetchStockCodes() {
+  const data = await fs.readFileSync("./tw-stock-codes", "utf-8");
+  return data.split("\n");
+}
+
+async function fetchData() {
   const stocks = {};
-  for (let date of dates) {
-    try {
-      let monthlyData = JSON.parse(
-        fs.readFileSync(`./data/${date.slice(0, 6)}-stock-prices.json`)
-      );
-      const data = monthlyData[date];
-      const stockIds = Object.keys(data);
-      for (const stockId of stockIds) {
-        if (!stocks[stockId]) stocks[stockId] = { prices: [], amounts: [] };
-        stocks[stockId].prices.push(data[stockId].avgPrice);
-        stocks[stockId].amounts.push(data[stockId].totalAmount);
+
+  const dates = await calDates();
+  const stockCodes = await fetchStockCodes();
+
+  for (const stockCode of stockCodes) {
+    let countDays = 0;
+    const prices = [];
+
+    for (const date of dates) {
+      const res = await axios.get(URL+`${date}&stockNo=${stockCode}`);
+      await sleep();
+      for (const dailyInfo of res.data.data) {
+        prices.push((parseFloat(dailyInfo[3])+parseFloat(dailyInfo[6])/2));
+        if (++countDays === DAYS) break;
       }
-    } catch (e) {
-      // skip if the data doesn't exist
     }
-  }
 
-  for (let stockId of Object.keys(stocks)) {
-    let prices = stocks[stockId].prices;
-    const lastPrice = prices[prices.length - 1];
-    prices = prices.slice(0, prices.length - 1);
-    const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const avgPrice = prices.reduce((a, b) => a+b)/prices.length;
 
-    // calculate deviation
     let dev = 0;
-    for (let p of prices) dev += (p - avg) ** 2;
-    dev = (dev / prices.length) ** 0.5;
+    prices.forEach((p) => dev += (p-avgPrice)**2);
+    dev = (dev/prices.length)**0.5;
 
-    stocks[stockId].avgPrice = avg;
-    stocks[stockId].targetPrice = avg - dev * 2;
+    const targetPrice = avgPrice - dev * 2;
+    const isTarget = prices.slice(-1) < targetPrice ? true: false;
 
-    let avgAmount = 0;
-    stocks[stockId].amounts.forEach(a => avgAmount += parseInt(a.replace(",", "")));
-    stocks[stockId].avgAmount = avgAmount / stocks[stockId].amounts.length;
+    stocks[stockCode] = {
+      prices,
+      avgPrice,
+      dev,
+      targetPrice,
+      isTarget,
+    };
+
+    if (isTarget === true)
+      console.log(`${stockCode} target: ${targetPrice.toFixed(2)} current: ${prices.slice(-1)}`);
   }
-
-  // sort stocks by avg amounts and the gap between target and avg prices
-  const sortedStocks = Object.keys(stocks).sort(
-    (a, b) =>
-      stocks[b].avgAmount -
-      stocks[a].avgAmount +
-      (stocks[b].avgPrice -
-        stocks[b].targetPrice -
-        (stocks[a].avgPrice - stocks[a].targetPrice))
-  );
-
-  for (let i = 0; i < 20; i++) {
-    if (stocks[sortedStocks[i]].targetPrice < stocks[sortedStocks[i]].prices.slice(-1)) {
-      console.log("No more target");
-      break;
-    }
-    console.log(sortedStocks[i], stocks[sortedStocks[i]]);
-  }
+  fs.writeFileSync(`./data/${today.getFullYear()}${("0"+(today.getMonth()+1)).slice(-2)}${today.getDate()}-stocks.json`, JSON.stringify(stocks, null, 4));
+  return stocks;
 }
 
-async function start() {
-  await getDailyData();
-  calculateAvg();
-}
-
-start();
+module.exports = fetchData;

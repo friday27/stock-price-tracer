@@ -2,10 +2,11 @@
 
 ## To Dos
 
-* Chatbot as a reminder (sell/buy)
+* Heroku API
 
-* Run a cronjob to update prices every day after market closed
-  * Save data in Google Drive
+* cronjob
+
+* Chatbot as a reminder (targets)
 
 * Use historical data to verify the ranking
 

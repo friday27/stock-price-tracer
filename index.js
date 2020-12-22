@@ -1,26 +1,16 @@
-const fs = require('fs');
-const readline = require('readline');
-const {google} = require('googleapis');
+"use strict";
 
-const credentials = require('./credentials.json');
+const express = require("express");
+const fetchData = require("./app");
 
-const scopes = ['https://www.googleapis.com/auth/drive'];
+const app = express();
+const port = process.env.PORT || 3000;
 
-const auth = new google.auth.JWT(
-  credentials.client_email, null,
-  credentials.private_key, scopes
-);
+app.get("", (req, res) => {
+  console.log("Received request");
+  return res.send(fetchData());
+});
 
-const drive = google.drive({ version: "v3", auth });
-
-drive.files.list({}, (err, res) => {
-  if (err) throw err;
-  const files = res.data.files;
-  if (files.length) {
-  files.map((file) => {
-    console.log(file);
-  });
-  } else {
-    console.log('No files found');
-  }
+app.listen(port, () => {
+  console.log(`Server is up on port ${port}`);
 });
