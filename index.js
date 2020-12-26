@@ -1,11 +1,11 @@
 "use strict";
 
 const express = require("express");
-const linebot = require('linebot');
-const BodyParser = require('body-parser');
-const fetchData = require("./app");
+const linebot = require("linebot");
+const BodyParser = require("body-parser");
+const { fetchData, combineData, broadcastMovingAvg } = require("./app");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 const bot = linebot({
   channelId: process.env.LINE_CHANNEL_ID,
@@ -16,17 +16,20 @@ const bot = linebot({
 const linebotParser = bot.parser();
 const app = express();
 
-app.post('/linewebhook', linebotParser);
+app.post("/linewebhook", linebotParser);
 
 app.use(BodyParser.urlencoded({ extended: true }));
 app.use(BodyParser.json());
 
-app.post('/broadcast', (req, res) => {
-  bot.broadcast(req.body.message).then(() => {
-    res.send('broadcast ok');
-  }).catch(function (error) {
-    res.send('broadcast fail');
-  });
+app.post("/broadcast", async (req, res) => {
+  const today = new Date();
+  await bot.broadcast(
+    `===================\nStart fetching\n${today.getFullYear()}-${
+      today.getMonth() + 1
+    }-${today.getDate()} stock data\n===================`
+  );
+  await broadcastMovingAvg(bot);
+  return res.send("ok");
 });
 
 app.listen(port, () => {
