@@ -3,10 +3,9 @@
 const axios = require("axios");
 const fs = require("fs");
 
-const DAYS = 90;
-const URL =
-  "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=";
-const GOOGLE_URL = "https://www.google.com/search?q=%E8%82%A1%E5%83%B9+";
+const DAYS = process.env.DAYS;
+const TWSE_URL = process.env.TWSE_URL;
+const GOOGLE_URL = process.env.GOOGLE_URL;
 
 const dir = "./data/";
 
@@ -30,7 +29,7 @@ async function fetchData(bot) {
     let run = 0;
     while (run < 3) {
       try {
-        const res = await axios.get(URL + `${date}&stockNo=${stockCode}`);
+        const res = await axios.get(TWSE_URL + `${date}&stockNo=${stockCode}`);
 
         if (res.data.stat !== "OK") {
           console.log(stockCode, date, "no data", res.data.stat);
