@@ -115,23 +115,27 @@ async function combineData() {
 
   const currentData = await JSON.parse(fs.readFileSync(filename));
   const latestData = await fetchData();
-  return { ...data, ...latestData };
+  return { ...currentData, ...latestData };
 }
 
 async function broadcastMovingAvg(bot) {
   const stocks = await combineData();
 
-  const filename = `/stock-prices-${today.getFullYear()}${
-    today.getMonth() + 1
-  }${today.getDay()}.json`;
-  dbx
-    .filesUpload({ path: filename, contents: JSON.stringify(stocks) })
-    .then((res) => {
-      console.log(res.status, res.result);
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+  try {
+    const filename = `/stock-prices-${today.getFullYear()}${
+      today.getMonth() + 1
+    }${today.getDate()}.json`;
+    dbx
+      .filesUpload({ path: filename, contents: JSON.stringify(stocks) })
+      .then((res) => {
+        console.log(res.status, res.result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } catch (e) {
+    console.log("failed to upload file to Dropbox", e.message);
+  }
 
   let targets = 0;
 
