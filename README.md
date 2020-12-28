@@ -1,13 +1,11 @@
 # stock-price-tracer
 
+## Trigger
+
+`curl -XPOST localhost:8080/broadcast`
+
 ## To Dos
 
-* Heroku API
-
-* cronjob
-
-* Chatbot as a reminder (targets)
-
-* Use historical data to verify the ranking
+* update stock list
 
 * US version

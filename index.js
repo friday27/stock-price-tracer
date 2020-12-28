@@ -3,7 +3,7 @@
 const express = require("express");
 const linebot = require("linebot");
 const BodyParser = require("body-parser");
-const { fetchData, combineData, broadcastMovingAvg } = require("./app");
+const { broadcastMovingAvg } = require("./app");
 
 const port = process.env.PORT;
 
