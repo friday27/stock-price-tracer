@@ -32,6 +32,10 @@ app.post("/broadcast", async (req, res) => {
   return res.send("ok");
 });
 
+app.get("/", (req, res) => {
+  return res.send({message: "Hello stranger!"});
+});
+
 app.listen(port, () => {
   console.log(`Server is up on port ${port}`);
 });
