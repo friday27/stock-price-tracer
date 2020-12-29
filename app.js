@@ -83,7 +83,7 @@ async function fetchData() {
   return stocks;
 }
 
-async function combineData() {
+async function fetchOldData() {
   const filename = "./stock-prices.json";
   let latestFileDate = 0;
 
@@ -102,9 +102,7 @@ async function combineData() {
         })
         .then((data) => {
           fs.writeFile(filename, data.result.fileBinary, "binary", (err) => {
-            if (err) {
-              throw err;
-            }
+            if (err) throw err;
             console.log(`File: ${filename} (${latestFileDate}) saved`);
           });
         });
@@ -114,12 +112,13 @@ async function combineData() {
     });
 
   const currentData = await JSON.parse(fs.readFileSync(filename));
-  const latestData = await fetchData();
-  return { ...currentData, ...latestData };
+  return currentData;
 }
 
 async function broadcastMovingAvg(bot) {
-  const stocks = await combineData();
+  const newData = await fetchData();
+  let stocks = await fetchOldData();
+  stocks = {...newData, ...stocks};
 
   try {
     const filename = `/stock-prices-${today.getFullYear()}${
