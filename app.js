@@ -117,8 +117,12 @@ async function fetchOldData() {
 
 async function broadcastMovingAvg(bot) {
   const newData = await fetchData();
-  let stocks = await fetchOldData();
-  stocks = {...newData, ...stocks};
+  const stocks = await fetchOldData();
+
+  for (const s of Object.keys(newData)) {
+    if (!stocks[s]) stocks[s] = {};
+    stocks[s] = {...stocks[s], ...newData[s]};
+  }
 
   try {
     const filename = `/stock-prices-${today.getFullYear()}${
