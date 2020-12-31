@@ -162,7 +162,7 @@ async function broadcastMovingAvg(bot) {
     for (const price of prices) dev += (price - daysAvg) ** 2;
     dev = (dev / prices.length) ** 0.5;
 
-    const targetPrice = daysAvg - dev * 2;
+    const targetPrice = daysAvg - dev;
     if (prices[0] <= targetPrice) {
       const msg = `TW ${stock}\ntarget:   ${targetPrice.toFixed(
         2
