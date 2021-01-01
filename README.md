@@ -2,6 +2,7 @@
 
 ## To Dos
 
+* add stock names
 * update stock list
 * clean
 * US version
