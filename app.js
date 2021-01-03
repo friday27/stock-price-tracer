@@ -27,7 +27,9 @@ async function fetchData() {
   const stocks = {};
   const stockCodes = await fetchStockCodes();
 
-  const date = `${today.getFullYear()}${today.getMonth() + 1}01`;
+  const date = `${today.getFullYear()}${("0" + today.getMonth() + 1).slice(
+    -2
+  )}01`;
 
   for (const stockCode of stockCodes) {
     stocks[stockCode] = {};
@@ -121,7 +123,7 @@ async function broadcastMovingAvg(bot) {
 
   for (const s of Object.keys(newData)) {
     if (!stocks[s]) stocks[s] = {};
-    stocks[s] = {...stocks[s], ...newData[s]};
+    stocks[s] = { ...stocks[s], ...newData[s] };
   }
 
   try {

@@ -38,4 +38,3 @@ GOOGLE_URL=https://www.google.com/search?q=%E8%82%A1%E5%83%B9+
 ## Reference
 
 * [Dropbox Node SDK Doc](https://dropbox.github.io/dropbox-sdk-js/index.html)
-* [手把手教你建聊天機器人(linebot+nodjes+ngrok)](https://medium.com/@mengchiang000/%E6%89%8B%E6%8A%8A%E6%89%8B%E6%95%99%E4%BD%A0%E5%BB%BA%E8%81%8A%E5%A4%A9%E6%A9%9F%E5%99%A8%E4%BA%BA-linebot-nodjes-ngrok-7ad028d97a07)
