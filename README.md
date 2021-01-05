@@ -1,10 +1,10 @@
 # stock-price-tracer
 
+[Line ChatBot 微專案 — 股票推薦機器人 (NodeJS/Heroku/Cronjob)](https://sytw1989.medium.com/line-chatbot-%E5%BE%AE%E5%B0%88%E6%A1%88-%E8%82%A1%E7%A5%A8%E6%8E%A8%E8%96%A6%E6%A9%9F%E5%99%A8%E4%BA%BA-nodejs-heroku-cronjob-f21ac98ea58a)
+
 ## To Dos
 
-* add stock names
 * update stock list
-* clean
 * US version
 
 ## Steps
