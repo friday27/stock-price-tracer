@@ -127,9 +127,10 @@ async function broadcastMovingAvg(bot) {
   }
 
   try {
-    const filename = `/stock-prices-${today.getFullYear()}${
-      today.getMonth() + 1
-    }${today.getDate()}.json`;
+    const filename = `/stock-prices-${today.getFullYear()}${(
+      "0" +
+      (today.getMonth() + 1)
+    ).slice(-2)}${("0" + today.getDate()).slice(-2)}.json`;
     dbx
       .filesUpload({ path: filename, contents: JSON.stringify(stocks) })
       .then((res) => {
@@ -159,7 +160,7 @@ async function broadcastMovingAvg(bot) {
       prices.push(avg);
     }
 
-    const daysAvg = prices.reduce((a, b) => a + b) / prices.length;
+    const daysAvg = prices.reduce((a, b) => a + b, 0) / prices.length;
     let dev = 0;
     for (const price of prices) dev += (price - daysAvg) ** 2;
     dev = (dev / prices.length) ** 0.5;
