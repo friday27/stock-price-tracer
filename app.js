@@ -124,6 +124,9 @@ async function broadcastMovingAvg(bot) {
   for (const s of Object.keys(newData)) {
     if (!stocks[s]) stocks[s] = {};
     stocks[s] = { ...stocks[s], ...newData[s] };
+    console.log(
+      `Saved ${s} stock data for ${Object.keys(stocks[s]).length} dates`
+    );
   }
 
   try {
@@ -151,6 +154,9 @@ async function broadcastMovingAvg(bot) {
     let dates = Object.keys(stocks[stock]);
     dates.sort((a, b) => parseInt(b) - parseInt(a));
     dates = dates.slice(0, DAYS);
+
+    // TODO: find the source of old data
+    if (dates[0].includes("2020")) continue;
 
     for (const date of dates) {
       const avg =
