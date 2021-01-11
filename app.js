@@ -156,7 +156,12 @@ async function broadcastMovingAvg(bot) {
     dates = dates.slice(0, DAYS);
 
     // TODO: find the source of old data
-    if (dates[0].includes("2020")) continue;
+    try {
+      if (dates[0].includes("2020")) continue;
+    } catch (e) {
+      console.error("failed at dates[0].includes('2020')", e);
+      continue;
+    }
 
     for (const date of dates) {
       const avg =
