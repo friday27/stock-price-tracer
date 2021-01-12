@@ -156,19 +156,15 @@ async function broadcastMovingAvg(bot) {
     dates = dates.slice(0, DAYS);
 
     // TODO: find the source of old data
-    try {
-      if (dates[0].includes("2020")) continue;
-    } catch (e) {
-      console.error("failed at dates[0].includes('2020')", e);
-      continue;
-    }
+    if (!dates[0] || dates[0].includes("2020")) continue;
 
     for (const date of dates) {
-      const avg =
-        (parseFloat(stocks[stock][date].open) +
-          parseFloat(stocks[stock][date].end)) /
-        2;
-      prices.push(avg);
+      // const avg =
+      //   (parseFloat(stocks[stock][date].open) +
+      //     parseFloat(stocks[stock][date].end)) /
+      //   2;
+      prices.push(stocks[stock][date].open);
+      prices.push(stocks[stock][date].end);
     }
 
     const daysAvg = prices.reduce((a, b) => a + b, 0) / prices.length;
@@ -185,6 +181,8 @@ async function broadcastMovingAvg(bot) {
       })\n${GOOGLE_URL}${stock}`;
       await bot.broadcast(msg);
       targets++;
+
+      console.log(msg, "prices[0]:", prices[0]);
     }
   }
 
