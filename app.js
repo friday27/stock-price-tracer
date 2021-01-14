@@ -149,6 +149,7 @@ async function broadcastMovingAvg(bot) {
   let targets = 0;
 
   for (const stock of Object.keys(stocks)) {
+    if (stock.length === 0) continue;
     const prices = [];
 
     let dates = Object.keys(stocks[stock]);
@@ -156,13 +157,9 @@ async function broadcastMovingAvg(bot) {
     dates = dates.slice(0, DAYS);
 
     // TODO: find the source of old data
-    if (!dates[0] || dates[0].includes("2020")) continue;
+    if (dates[0].includes("2020")) continue;
 
     for (const date of dates) {
-      // const avg =
-      //   (parseFloat(stocks[stock][date].open) +
-      //     parseFloat(stocks[stock][date].end)) /
-      //   2;
       prices.push(stocks[stock][date].open);
       prices.push(stocks[stock][date].end);
     }
