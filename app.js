@@ -124,7 +124,7 @@ async function broadcastMovingAvg(bot) {
 
   for (const s of Object.keys(newData)) {
     if (!stocks[s]) stocks[s] = {};
-    stocks[s] = { ...stocks[s], ...newData[s] };
+    stocks[s] = await { ...stocks[s], ...newData[s] };
   }
   delete stocks[""];
   console.log(`fetched prices for ${Object.keys(stocks).length} stocks`);
@@ -142,8 +142,6 @@ async function broadcastMovingAvg(bot) {
   } catch (e) {
     console.error("failed to upload file to Dropbox:", e.message);
   }
-
-  let targets = 0;
 
   for (const stock of Object.keys(stocks)) {
     if (stock.length === 0) continue;
@@ -166,27 +164,26 @@ async function broadcastMovingAvg(bot) {
     for (const price of prices) dev += (price - daysAvg) ** 2;
     dev = (dev / prices.length) ** 0.5;
 
-    const targetPrice = daysAvg - dev * 1.5;
-    if (prices[0] <= targetPrice) {
-      if (prices[0] <= 1) {
-        console.log("prices:", prices.slice(0, 10));
-        continue;
-      }
-      const msg = `TW ${stock}\ntarget:   ${targetPrice.toFixed(
+    const targetSellingPrice = daysAvg + dev * 2;
+    const targetBuyingPrice = daysAvg - dev * 2;
+    if (prices[0] <= targetBuyingPrice) {
+      const msg = `[Buy] TW ${stock}\ntarget:   ${targetBuyingPrice.toFixed(
         2
       )}\ncurrent: ${prices[0].toFixed(2)} (${
         dates[0]
       })\n${GOOGLE_URL}${stock}`;
-      await bot.broadcast(msg);
-      targets++;
-
+      bot.broadcast(msg);
+      console.log(msg, "prices[0]:", prices[0]);
+    } else if (prices[0] >= targetSellingPrice) {
+      const msg = `[Sell] TW ${stock}\ntarget:   ${targetSellingPrice.toFixed(
+        2
+      )}\ncurrent: ${prices[0].toFixed(2)} (${
+        dates[0]
+      })\n${GOOGLE_URL}${stock}`;
+      bot.broadcast(msg);
       console.log(msg, "prices[0]:", prices[0]);
     }
   }
-
-  bot.broadcast(
-    `===================\nfound ${targets} targets\n===================`
-  );
 }
 
 module.exports = {
