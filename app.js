@@ -32,6 +32,7 @@ async function fetchData() {
   )}01`;
 
   for (const stockCode of stockCodes) {
+    if (stockCode.length === 0) continue;
     stocks[stockCode] = {};
     let run = 0;
     while (run < 3) {
@@ -124,10 +125,9 @@ async function broadcastMovingAvg(bot) {
   for (const s of Object.keys(newData)) {
     if (!stocks[s]) stocks[s] = {};
     stocks[s] = { ...stocks[s], ...newData[s] };
-    console.log(
-      `Saved ${s} stock data for ${Object.keys(stocks[s]).length} dates`
-    );
   }
+  delete stocks[""];
+  console.log(`fetched prices for ${Object.keys(stocks).length} stocks`);
 
   try {
     const filename = `/stock-prices-${today.getFullYear()}${(
@@ -137,13 +137,10 @@ async function broadcastMovingAvg(bot) {
     dbx
       .filesUpload({ path: filename, contents: JSON.stringify(stocks) })
       .then((res) => {
-        console.log(res.status, res.result);
-      })
-      .catch((err) => {
-        console.error(err);
+        console.log("new file uploaded to Dropbox: ", res.result.path_display);
       });
   } catch (e) {
-    console.log("failed to upload file to Dropbox", e.message);
+    console.error("failed to upload file to Dropbox:", e.message);
   }
 
   let targets = 0;
@@ -154,7 +151,7 @@ async function broadcastMovingAvg(bot) {
 
     let dates = Object.keys(stocks[stock]);
     dates.sort((a, b) => parseInt(b) - parseInt(a));
-    dates = dates.slice(0, DAYS);
+    // dates = dates.slice(0, DAYS);
 
     // TODO: find the source of old data
     if (dates[0].includes("2020")) continue;
