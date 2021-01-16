@@ -4,7 +4,6 @@
 
 ## To Dos
 
-* update stock list
 * US version
 
 ## Steps
