@@ -149,10 +149,10 @@ async function broadcastMovingAvg(bot) {
 
     let dates = Object.keys(stocks[stock]);
     dates.sort((a, b) => parseInt(b) - parseInt(a));
-    // dates = dates.slice(0, DAYS);
+    dates = dates.slice(0, DAYS);
 
     // TODO: find the source of old data
-    if (dates[0].includes("2020")) continue;
+    // if (dates[0].includes("2020")) continue;
 
     for (const date of dates) {
       prices.push(stocks[stock][date].open);
